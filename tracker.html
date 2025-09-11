@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily & Weekly Task Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #ffe4ec;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 20px auto;
+      background: #fff0f6;
+      padding: 15px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3);
+    }
+
+    h1 {
+      text-align: center;
+      color: #d63384;
+      font-size: 1.6rem;
+    }
+
+    .tabs {
+      display: flex;
+      overflow-x: auto;
+      margin-bottom: 15px;
+      gap: 5px;
+    }
+
+    .tab {
+      flex: 0 0 auto;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 10px;
+      background: #f8bbd0;
+      transition: background 0.3s;
+      color: #6b0f3a;
+      font-weight: bold;
+      min-width: 90px;
+      font-size: 0.9rem;
+    }
+
+    .tab.active {
+      background: #ec407a;
+      color: white;
+    }
+
+    .task-section {
+      display: none;
+    }
+
+    .task-section.active {
+      display: block;
+    }
+
+    .task-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .task-list li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px;
+      margin: 5px 0;
+      background: #ffe6ef;
+      border-radius: 8px;
+      border: 1px solid #f48fb1;
+      font-size: 0.9rem;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .task-list li.done span {
+      text-decoration: line-through;
+      color: #999;
+    }
+
+    .task-actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    input[type="text"] {
+      width: 65%;
+      padding: 8px;
+      border: 1px solid #f48fb1;
+      border-radius: 8px;
+      background: #fff0f6;
+      font-size: 0.9rem;
+    }
+
+    button {
+      padding: 6px 10px;
+      border: none;
+      background: #ec407a;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-left: 5px;
+      font-size: 0.85rem;
+    }
+
+    button:hover {
+      background: #d81b60;
+    }
+
+    .done-btn {
+      background: #10b981;
+    }
+
+    .done-btn:hover {
+      background: #059669;
+    }
+
+    .remove-btn {
+      background: #ef4444;
+    }
+
+    .remove-btn:hover {
+      background: #dc2626;
+    }
+
+    .clear-btn {
+      background: #f48fb1;
+      margin-top: 10px;
+    }
+
+    .clear-btn:hover {
+      background: #ec407a;
+    }
+
+    /* Calendar Widget */
+    .calendar {
+      position: fixed;
+      right: 10px;
+      bottom: 10px;
+      background: #fff0f6;
+      padding: 10px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(255, 105, 180, 0.4);
+      font-size: 13px;
+      text-align: center;
+      width: 250px;
+      border: 1px solid #f48fb1;
+    }
+
+    .calendar h3 {
+      margin: 0 0 5px;
+      font-size: 14px;
+      color: #d63384;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .calendar h3 button {
+      background: #f48fb1;
+      border: none;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .calendar h3 button:hover {
+      background: #ec407a;
+    }
+
+    .calendar p {
+      margin: 2px 0 10px;
+      color: #6b0f3a;
+      font-size: 12px;
+    }
+
+    .calendar table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .calendar th, .calendar td {
+      width: 14.28%;
+      padding: 4px;
+      text-align: center;
+      border-radius: 6px;
+    }
+
+    .calendar td.today {
+      background: #ec407a;
+      color: white;
+      font-weight: bold;
+    }
+
+    .calendar td:hover {
+      background: #f8bbd0;
+    }
+
+    /* 📱 Mobile adjustments */
+    @media (max-width: 600px) {
+      .container {
+        margin: 10px;
+        padding: 10px;
+      }
+      h1 {
+        font-size: 1.3rem;
+      }
+      input[type="text"] {
+        width: 100%;
+        margin-bottom: 5px;
+      }
+      button {
+        width: auto;
+        margin: 2px 1%;
+      }
+      .calendar {
+        width: 200px;
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Daily & Weekly Task Tracker</h1>
+
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('today')">Today</div>
+      <div class="tab" onclick="showTab('monday')">Monday</div>
+      <div class="tab" onclick="showTab('tuesday')">Tuesday</div>
+      <div class="tab" onclick="showTab('wednesday')">Wednesday</div>
+      <div class="tab" onclick="showTab('thursday')">Thursday</div>
+      <div class="tab" onclick="showTab('friday')">Friday</div>
+      <div class="tab" onclick="showTab('saturday')">Saturday</div>
+      <div class="tab" onclick="showTab('sunday')">Sunday</div>
+    </div>
+
+    <!-- Task Sections -->
+    <div id="today" class="task-section active">
+      <h2>Today’s Tasks</h2>
+      <ul class="task-list" id="today-list"></ul>
+      <input type="text" id="today-input" placeholder="Add a task...">
+      <button onclick="addTask('today')">Add</button>
+      <button class="clear-btn" onclick="clearAll('today')">Clear All</button>
+    </div>
+
+    <div id="monday" class="task-section">
+      <h2>Monday</h2>
+      <ul class="task-list" id="monday-list"></ul>
+      <input type="text" id="monday-input" placeholder="Add a task...">
+      <button onclick="addTask('monday')">Add</button>
+      <button class="clear-btn" onclick="clearAll('monday')">Clear All</button>
+    </div>
+
+    <div id="tuesday" class="task-section">
+      <h2>Tuesday</h2>
+      <ul class="task-list" id="tuesday-list"></ul>
+      <input type="text" id="tuesday-input" placeholder="Add a task...">
+      <button onclick="addTask('tuesday')">Add</button>
+      <button class="clear-btn" onclick="clearAll('tuesday')">Clear All</button>
+    </div>
+
+    <div id="wednesday" class="task-section">
+      <h2>Wednesday</h2>
+      <ul class="task-list" id="wednesday-list"></ul>
+      <input type="text" id="wednesday-input" placeholder="Add a task...">
+      <button onclick="addTask('wednesday')">Add</button>
+      <button class="clear-btn" onclick="clearAll('wednesday')">Clear All</button>
+    </div>
+
+    <div id="thursday" class="task-section">
+      <h2>Thursday</h2>
+      <ul class="task-list" id="thursday-list"></ul>
+      <input type="text" id="thursday-input" placeholder="Add a task...">
+      <button onclick="addTask('thursday')">Add</button>
+      <button class="clear-btn" onclick="clearAll('thursday')">Clear All</button>
+    </div>
+
+    <div id="friday" class="task-section">
+      <h2>Friday</h2>
+      <ul class="task-list" id="friday-list"></ul>
+      <input type="text" id="friday-input" placeholder="Add a task...">
+      <button onclick="addTask('friday')">Add</button>
+      <button class="clear-btn" onclick="clearAll('friday')">Clear All</button>
+    </div>
+
+    <div id="saturday" class="task-section">
+      <h2>Saturday</h2>
+      <ul class="task-list" id="saturday-list"></ul>
+      <input type="text" id="saturday-input" placeholder="Add a task...">
+      <button onclick="addTask('saturday')">Add</button>
+      <button class="clear-btn" onclick="clearAll('saturday')">Clear All</button>
+    </div>
+
+    <div id="sunday" class="task-section">
+      <h2>Sunday</h2>
+      <ul class="task-list" id="sunday-list"></ul>
+      <input type="text" id="sunday-input" placeholder="Add a task...">
+      <button onclick="addTask('sunday')">Add</button>
+      <button class="clear-btn" onclick="clearAll('sunday')">Clear All</button>
+    </div>
+  </div>
+
+  <!-- Calendar Widget -->
+  <div class="calendar" id="calendar"></div>
+
+  <script>
+    // Load tasks when page opens
+    window.onload = function() {
+      const days = ["today", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+      days.forEach(day => loadTasks(day));
+      renderCalendar();
+      setInterval(updateTime, 1000);
+    };
+
+    function showTab(day) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.task-section').forEach(sec => sec.classList.remove('active'));
+
+      document.querySelector(`[onclick="showTab('${day}')"]`).classList.add('active');
+      document.getElementById(day).classList.add('active');
+    }
+
+    function addTask(day) {
+      const input = document.getElementById(day + '-input');
+      const taskText = input.value.trim();
+      if (taskText === "") return;
+
+      const task = { text: taskText, done: false };
+      let tasks = JSON.parse(localStorage.getItem(day)) || [];
+      tasks.push(task);
+      localStorage.setItem(day, JSON.stringify(tasks));
+
+      renderTask(day, task);
+      input.value = "";
+    }
+
+    function renderTask(day, task) {
+      const list = document.getElementById(day + '-list');
+      const li = document.createElement('li');
+
+      const span = document.createElement('span');
+      span.textContent = task.text;
+
+      const actions = document.createElement('div');
+      actions.classList.add('task-actions');
+
+      const doneBtn = document.createElement('button');
+      doneBtn.textContent = task.done ? "Undo" : "Done";
+      doneBtn.classList.add('done-btn');
+
+      if (task.done) {
+        li.classList.add('done');
+      }
+
+      doneBtn.onclick = () => {
+        li.classList.toggle('done');
+        task.done = !task.done;
+        doneBtn.textContent = task.done ? "Undo" : "Done";
+        updateTaskStatus(day, task.text, task.done);
+      };
+
+      const removeBtn = document.createElement('button');
+      removeBtn.textContent = "Remove";
+      removeBtn.classList.add('remove-btn');
+      removeBtn.onclick = () => {
+        li.remove();
+        deleteTask(day, task.text);
+      };
+
+      actions.appendChild(doneBtn);
+      actions.appendChild(removeBtn);
+
+      li.appendChild(span);
+      li.appendChild(actions);
+      list.appendChild(li);
+    }
+
+    function loadTasks(day) {
+      const tasks = JSON.parse(localStorage.getItem(day)) || [];
+      const list = document.getElementById(day + '-list');
+      list.innerHTML = "";
+      tasks.forEach(task => renderTask(day, task));
+    }
+
+    function updateTaskStatus(day, taskText, doneStatus) {
+      let tasks = JSON.parse(localStorage.getItem(day)) || [];
+      tasks = tasks.map(t => t.text === taskText ? { ...t, done: doneStatus } : t);
+      localStorage.setItem(day, JSON.stringify(tasks));
+    }
+
+    function deleteTask(day, taskText) {
+      let tasks = JSON.parse(localStorage.getItem(day)) || [];
+      tasks = tasks.filter(t => t.text !== taskText);
+      localStorage.setItem(day, JSON.stringify(tasks));
+    }
+
+    function clearAll(day) {
+      localStorage.removeItem(day);
+      document.getElementById(day + "-list").innerHTML = "";
+    }
+
+    // 📅 Calendar + Time
+    let currentDate = new Date();
+
+function renderCalendar() {
+  const calendarEl = document.getElementById("calendar");
+  const month = currentDate.getMonth();
+  const year = currentDate.getFullYear();
+  const today = new Date();
+
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const daysInMonth = lastDay.getDate();
+
+  let html = `
+    <h3>
+      <button onclick="prevMonth()">&lt;</button>
+      ${monthNames[month]} ${year}
+      <button onclick="nextMonth()">&gt;</button>
+    </h3>
+    <p id="time"></p>
+    <table>
+      <tr>
+        <th>Su</th><th>Mo</th><th>Tu</th><th>We</th>
+        <th>Th</th><th>Fr</th><th>Sa</th>
+      </tr>
+      <tr>
+  `;
+
+  let dayOfWeek = firstDay.getDay();
+  for (let i = 0; i < dayOfWeek; i++) {
+    html += "<td></td>";
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    let isToday =
+      day === today.getDate() &&
+      month === today.getMonth() &&
+      year === today.getFullYear();
+    html += `<td class="${isToday ? 'today' : ''}">${day}</td>`;
+    if ((day + dayOfWeek) % 7 === 0) html += "</tr><tr>";
+  }
+
+  html += "</tr></table>";
+  calendarEl.innerHTML = html;
+  updateTime();
+}
+
+
+    function updateTime() {
+      document.getElementById("time").textContent = 
+        new Date().toLocaleTimeString();
+    }
+
+    function prevMonth() {
+      currentDate.setMonth(currentDate.getMonth() - 1);
+      renderCalendar();
+    }
+
+    function nextMonth() {
+      currentDate.setMonth(currentDate.getMonth() + 1);
+      renderCalendar();
+    }
+  </script>
+</body>
+</html>
