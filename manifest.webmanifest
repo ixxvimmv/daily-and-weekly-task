@@ -1,0 +1,18 @@
+{
+  "name": "Daily & Weekly Task Tracker",
+  "short_name": "Tasks",
+  "description": "A simple daily and weekly task tracker with a calendar.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffe4ec",
+  "theme_color": "#d81b60",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
